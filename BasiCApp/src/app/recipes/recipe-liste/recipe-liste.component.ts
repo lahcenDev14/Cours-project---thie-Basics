@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 import {Recipe} from '../recipe.model';
 
@@ -9,7 +9,13 @@ import {Recipe} from '../recipe.model';
 })
 export class RecipeListeComponent {
 
-   recipes : Recipe[] = [new Recipe('this is a recipe test','a test of recipe','https://i2.wp.com/www.downshiftology.com/wp-content/uploads/2015/11/shakshuka-11.jpg'),
-  new Recipe('this is a recipe test','a test of recipe','https://i2.wp.com/www.downshiftology.com/wp-content/uploads/2015/11/shakshuka-11.jpg'),];
+  @Output() recipeWasSelected = new EventEmitter<Recipe>();
+   recipes : Recipe[] = [new Recipe('recip1','a test of recipe','https://i2.wp.com/www.downshiftology.com/wp-content/uploads/2015/11/shakshuka-11.jpg'),
+  new Recipe('recip2','a test of recipe','https://i2.wp.com/www.downshiftology.com/wp-content/uploads/2015/11/shakshuka-11.jpg'),];
+
+  OnrecipeSelected(recipe : Recipe)
+  {
+       this.recipeWasSelected.emit(recipe);
+  }
   
 }
