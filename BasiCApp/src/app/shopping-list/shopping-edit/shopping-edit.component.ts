@@ -1,4 +1,6 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import { NgForm } from '@angular/forms';
+import { Subscription } from 'rxjs-compat';
 import {Ingredients} from '../../shared/ingredients.model';
 import {ShoppingListService} from '../shopping-list.service';
 
@@ -7,25 +9,72 @@ import {ShoppingListService} from '../shopping-list.service';
   templateUrl: './shopping-edit.component.html',
   styleUrls: ['./shopping-edit.component.css']
 })
-export class ShoppingEditComponent {
+export class ShoppingEditComponent implements OnInit,OnDestroy {
+@ViewChild('f') slchild:NgForm;
+
+  subscription : Subscription;
+  ideditingitem : number;
+  editmode = false;
+  ingredientss : Ingredients;
 
   constructor(private shoppingservice:ShoppingListService){
 
   }
 
+  ngOnInit(): void {
+    
+    this.subscription = this.shoppingservice.startediting.subscribe(
+      (index : number) =>{
+        this.ideditingitem = index;
+        this.editmode = true;
+        this.ingredientss = this.shoppingservice.detingredientsedit(index);
+        this.slchild.setValue({
+          name : this.ingredientss.name,
+          amount : this.ingredientss.amount
+        })
+      }
+    );
+
+    
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
+
   ingredient : Ingredients[];
 
-  @ViewChild('nameingre') nameingre:string;
-  @ViewChild('amount') amount:number;
+  //@ViewChild('nameingre') nameingre:ElementRef;
+//  @ViewChild('amount') amount:ElementRef;
 
 
-  onaddingredient(nameingre : string,amountingre : number){
-    const name =nameingre;
-    const amount = amountingre;
-    const ingredientss  = new Ingredients(name,amount);
+onclear(){
+  this.slchild.reset()
+  this.editmode = false;
+}
 
-    this.shoppingservice.ingredientevent(ingredientss);
 
+onaddingredient(form : NgForm){
+    //const name =nameingre;
+    //const amount = amountingre;
+  
+    const value = form.value;
+    const ingredient  = new Ingredients(value.name,value.amount);
+    if(this.editmode){
+      this.shoppingservice.updateingredients(this.ideditingitem, ingredient)
+    }else{
+      this.shoppingservice.ingredientevent(ingredient);
+    }
+    this.editmode = false;
+    form.reset();
+    
+
+  }
+
+  ondelete(){
+    this.shoppingservice.delete(this.ideditingitem);
+    this.onclear();
+     
   }
 
 

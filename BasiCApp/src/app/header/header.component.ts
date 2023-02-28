@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Output } from '@angular/core';
+import { DataStorageService } from '../shared/data-storage.service';
 
 
 
@@ -9,11 +10,18 @@ import { Component, EventEmitter, Output } from '@angular/core';
 })
 export class HeaderComponent {
 
-  @Output() loadedfeature =new EventEmitter<string>();
+
+  constructor(private datastorage : DataStorageService){}
+
+  //@Output() loadedfeature =new EventEmitter<string>();
  
-  onselect(featured : string)
+  /*onselect(featured : string)
   {
      this.loadedfeature.emit(featured);
+  }*/
+
+  onstorereceipe(){
+    this.datastorage.storeercepise();
   }
 
 
